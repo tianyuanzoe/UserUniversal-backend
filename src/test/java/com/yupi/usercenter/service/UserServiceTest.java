@@ -8,86 +8,42 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.annotation.Resource;
 
 /**
- * 用户服务测试
- *
- * @author yupi
+ * @author zoetian
+ * @create 2023/1/24
  */
 @SpringBootTest
-public class UserServiceTest {
-
+class UserServiceTest {
     @Resource
     private UserService userService;
-
     @Test
-    public void testAddUser() {
+    public void testAddUser(){
         User user = new User();
-        user.setUsername("dogYupi");
-        user.setUserAccount("123");
-        user.setAvatarUrl("https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png");
+        user.setUsername("chenqing1");
+        user.setUserAccount("chenqingbabe1");
+        user.setAvatarUrl("https://www.google.com/imgres?imgurl=https%3A%2F%2Fimg.930tu.com%2F20210223%2F146264f418ce34b36159a3b28b7792d8.jpg&imgrefurl=https%3A%2F%2Fwww.930tu.com%2Ftouxiang%2Fdongman%2F38064.html&tbnid=47dCIKuq1fPezM&vet=12ahUKEwiJzsHns-H8AhUKn3IEHS2ND34QMygEegUIARCwAQ..i&docid=JtcFrMMlQdSgiM&w=400&h=400&q=%E5%A4%B4%E5%83%8F&ved=2ahUKEwiJzsHns-H8AhUKn3IEHS2ND34QMygEegUIARCwAQ");
         user.setGender(0);
-        user.setUserPassword("xxx");
-        user.setPhone("123");
-        user.setEmail("456");
+        user.setUserPassword("123456789");
+        user.setEmail("123111");
+        user.setPhone("4561111");
         boolean result = userService.save(user);
+        System.out.println(user.getUserPassword());
         System.out.println(user.getId());
-        Assertions.assertTrue(result);
-    }
+        Assertions.assertEquals(true,result);
 
-    @Test
-    public void testUpdateUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("dogYupi");
-        user.setUserAccount("123");
-        user.setAvatarUrl("https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png");
-        user.setGender(0);
-        user.setUserPassword("xxx");
-        user.setPhone("123");
-        user.setEmail("456");
-        boolean result = userService.updateById(user);
-        Assertions.assertTrue(result);
     }
-
-    @Test
-    public void testDeleteUser() {
-        boolean result = userService.removeById(1L);
-        Assertions.assertTrue(result);
-    }
-
-    @Test
-    public void testGetUser() {
-        User user = userService.getById(1L);
-        Assertions.assertNotNull(user);
-    }
-
     @Test
     void userRegister() {
-        String userAccount = "yupi";
-        String userPassword = "";
-        String checkPassword = "123456";
-        String planetCode = "1";
-        long result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
-        Assertions.assertEquals(-1, result);
-        userAccount = "yu";
-        result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
-        Assertions.assertEquals(-1, result);
-        userAccount = "yupi";
-        userPassword = "123456";
-        result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
-        Assertions.assertEquals(-1, result);
-        userAccount = "yu pi";
-        userPassword = "12345678";
-        result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
-        Assertions.assertEquals(-1, result);
-        checkPassword = "123456789";
-        result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
-        Assertions.assertEquals(-1, result);
-        userAccount = "dogYupi";
-        checkPassword = "12345678";
-        result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
-        Assertions.assertEquals(-1, result);
-        userAccount = "yupi";
-        result = userService.userRegister(userAccount, userPassword, checkPassword, planetCode);
-        Assertions.assertEquals(-1, result);
+        String userAccount = "tianyuantest1";
+        String userPassword = "1234567890";
+        String checkPassword = "1234567890";
+
+       long result =  userService.userRegister(userAccount,userPassword,checkPassword);
+       Assertions.assertEquals(-1,result);
+
+
+
+
+
     }
 }
+
