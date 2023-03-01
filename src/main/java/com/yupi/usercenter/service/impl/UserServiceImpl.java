@@ -126,6 +126,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
     @Override
     public User getSafetyUser(User originalUser){
+        if(originalUser == null){
+            return null;
+        }
         //用户脱敏(如果不脱敏，前端能看到从数据库中返回的所有用户信息
         User safetyUser = new User();
         safetyUser.setId(originalUser.getId());
@@ -137,6 +140,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserStatus(originalUser.getUserStatus());
         safetyUser.setEmail(originalUser.getEmail());
         safetyUser.setCreateTime(originalUser.getCreateTime());
+        safetyUser.setUserRole(originalUser.getUserRole());
         return safetyUser;
 
     }
