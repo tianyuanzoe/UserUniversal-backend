@@ -3,6 +3,8 @@ package com.yupi.usercenter.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yupi.usercenter.common.ErrorCode;
+import com.yupi.usercenter.exception.BusinessException;
 import com.yupi.usercenter.mapper.UserMapper;
 import com.yupi.usercenter.model.domain.User;
 import com.yupi.usercenter.service.UserService;
@@ -39,31 +41,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
         //authentication
     if(StringUtils.isAnyBlank(userAccount,userPassword,checkPassword)){
-        return -1;
+        throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
     }
     if(userAccount.length() < 4){
-        return -1;
+        throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账号小于4位");
+
     }
     if(userPassword.length() < 8 || checkPassword.length() < 8){
-        return -1;
+        throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户密码小于8位");
+
     }
     //no special characters
         String regExp = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(regExp).matcher(userAccount);
         if(matcher.find()){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"存在特殊字符");
         }
     //no duplicate userAccount
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq("userAccount",userAccount);
     long count = this.count(queryWrapper);
     if(count > 0){
-        return -1;
+        throw new BusinessException(ErrorCode.PARAMS_ERROR,"存在重复用户账号");
     }
 
     //password and validate password
         if(!userPassword.equals(checkPassword)){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"两次输入密码不匹配");
         }
 
         String encryptPassword =  DigestUtils.md5DigestAsHex((SALT  + userPassword).getBytes());
@@ -76,7 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         boolean saveResult = this.save(user);
         if(!saveResult){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"保存用户不成功");
         }
 
         return user.getId();
@@ -86,19 +90,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         //authentication
         if(StringUtils.isAnyBlank(userAccount,userPassword)){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号密码为空");
         }
         if(userAccount.length() < 4){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号长度小于4");
         }
         if(userPassword.length() < 8 ){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码长度小于8");
         }
         //no special characters
         String regExp = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(regExp).matcher(userAccount);
         if(matcher.find()){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"存在特殊字符");
         }
         //encrypt password
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT  + userPassword).getBytes());
@@ -110,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //user does not exist
         if(user == null){
             log.info("user login failed,user account can not match");
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"不存在该用户");
         }
         User safetyUser = getSafetyUser(user);
 
@@ -127,7 +131,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User getSafetyUser(User originalUser){
         if(originalUser == null){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
         }
         //用户脱敏(如果不脱敏，前端能看到从数据库中返回的所有用户信息
         User safetyUser = new User();
@@ -143,6 +147,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserRole(originalUser.getUserRole());
         return safetyUser;
 
+    }
+
+    /**
+     * 用户注销
+     * @param request
+     * @return
+     */
+
+    @Override
+    public int userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return 1;
     }
 
 }
